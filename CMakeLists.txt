@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.29 FATAL_ERROR)
+project(serialization)
+add_executable(${PROJECT_NAME}
+    src/main.cpp
+)
