@@ -2,18 +2,19 @@
 #define GUI_H
 
 #include "element.h"
+#include <stdint.h>
 
 namespace gui{
 	class GUI{
 	private:
-		static Element mainElement;	
+		Element* mainElement;
+		Element* currentElement;
+		uint32_t indexCurEl; 
 	public:
-		GUI() = delete;
-		GUI(GUI&) = delete;
-		void operator=(GUI&) = delete;
+		GUI();
+		~GUI();
 
-		static void init();
-		static void main_loop();
+		void main_loop();
 	};
 }
 

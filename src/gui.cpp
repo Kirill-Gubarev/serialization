@@ -1,10 +1,10 @@
 #include "gui.h"
+
 #include <iostream>
+#include "terminal.h"
 
-gui::Element gui::GUI::mainElement("main element");
-
-void gui::GUI::init(){
-	mainElement.addChild({
+gui::GUI::GUI():mainElement(new Element()){
+	mainElement->addChild({
 			new Element(),
 			new Element(),
 			new Element(),
@@ -12,8 +12,17 @@ void gui::GUI::init(){
 			new Element(),
 		});
 }
+gui::GUI::~GUI(){
+	delete mainElement;
+}
+
 void gui::GUI::main_loop(){
-	for(auto& el : mainElement.getChilds())
-		std::cout << el->getName() << '\n';
-	std::cout << std::endl;
+	setNewTerSet();
+	int ch = -1;
+	while(ch != 4){ //ctrl + d
+		ch = getOneChar();
+		std::cout << ch << " " << (char)ch << std::endl;
+	}
+
+	setOldTerSet();
 }

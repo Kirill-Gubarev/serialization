@@ -2,8 +2,8 @@
 #include <iostream>
 
 int main(int argc, char* argv[]){
-	gui::GUI::init();
-	gui::GUI::main_loop();
+	gui::GUI gui;
+	gui.main_loop();
 
 	std::cout << "press enter to continue" << std::endl;
 	std::cin.get();

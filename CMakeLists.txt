@@ -4,4 +4,5 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
 	src/element.cpp		src/element.h
 	src/gui.cpp			src/gui.h
+	src/terminal.c		src/terminal.h
 )
