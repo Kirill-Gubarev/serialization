@@ -9,12 +9,14 @@ namespace gui{
 	private:
 		Element* mainElement;
 		Element* currentElement;
-		uint32_t indexCurEl; 
+		uint32_t indexEl; 
 	public:
 		GUI();
 		~GUI();
 
 		void main_loop();
+	private:
+		void printElements() const;
 	};
 }
 
