@@ -2,77 +2,68 @@
 #include <iostream>
 
 #if defined (__linux__)
-#include <termios.h>
 #include <unistd.h>
 #elif defined (_WIN32)
 #include <conio.h>
-#include <windows.h>
 #endif
 
+ter::Terminal::Terminal(){
 #if defined (__linux__)
-static struct termios oldt;
+	tcgetattr(STDIN_FILENO, &oldSettings);
 #elif defined (_WIN32)
-static HANDLE hConsole;
-#endif
-
-void ter::setAltTerminal(bool state){
-	if(state){
-#if defined (_WIN32)
-		setVirtualTerminalProcessing(true);
-#endif
-		ter::setAltBuf(true);
-#if defined (__linux__)
-		ter::setInstantInputMode(true);
-#endif
-		ter::setCursorVisibility(false);
-	}
-	else{
-		ter::setCursorVisibility(true);
-#if defined (__linux__)
-		ter::setInstantInputMode(false);
-#endif
-		ter::setAltBuf(false);
-#if defined (_WIN32)
-		setVirtualTerminalProcessing(false);
-#endif
-	}
-}
-
-#if defined (__linux__)
-void ter::setInstantInputMode(bool state){
-	if(state){
-		tcgetattr(STDIN_FILENO, &oldt);
-		struct termios newt = oldt;
-		newt.c_lflag &= ~(ICANON | ECHO);
-		tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-	}
-	else{
-		tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-	}
-}
-#endif
-
-#if defined (_WIN32)
-void ter::setVirtualTerminalProcessing(bool state){
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
+}
+
+void ter::Terminal::setAltMode(bool state) const{
+#if defined (__linux__)
+	setInstantInputMode(state);
+	setAltBuf(state);
+	setCursorVisibility(!state);
+#elif defined (_WIN32)
+	if(state)
+		enableVirtualTerminalProcessing();
+	setAltBuf(state);
+	setCursorVisibility(!state);
+	if(!state)
+		disableVirtualTerminalProcessing();
+#endif
+}
+
+#if defined (__linux__)
+void ter::Terminal::setInstantInputMode(bool state) const{
+	if(state){
+		struct termios newSettings = oldSettings;
+		newSettings.c_lflag &= ~(ICANON | ECHO);
+		tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
+	}
+	else{
+		tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
+	}
+}
+#endif
+
+#if defined (_WIN32)
+void ter::Terminal::enableVirtualTerminalProcessing() const{
 	DWORD mode;
 	GetConsoleMode(hConsole, &mode);
-
-	if(state)
-		SetConsoleMode(hConsole, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-	else
-		SetConsoleMode(hConsole, mode & ~ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	SetConsoleMode(hConsole, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+}
+void ter::Terminal::disableVirtualTerminalProcessing() const{
+	DWORD mode;
+	GetConsoleMode(hConsole, &mode);
+	SetConsoleMode(hConsole, mode & ~ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }
 #endif
 
-void ter::setAltBuf(bool state){
+void ter::Terminal::setAltBuf(bool state) const{
 	if(state)
 		std::cout << "\033[?1049h" << std::endl;
 	else
 		std::cout << "\033[?1049l" << std::endl;
 }
 
-void ter::setCursorVisibility(bool state){
+void ter::Terminal::setCursorVisibility(bool state) const{
 	if(state)
 		std::cout << "\033[?25h" << std::endl;
 	else
@@ -80,15 +71,15 @@ void ter::setCursorVisibility(bool state){
 }
 
 #if defined (__linux__)
-int ter::instantGetChar(){
+int ter::Terminal::instantGetChar() const{
 	return getchar();
 }
 #elif defined (_WIN32)
-int ter::instantGetChar(){
+int ter::Terminal::instantGetChar() const{
 	return _getch();
 }
 #endif
 
-void ter::setColor(ter::Color color){
+void ter::Terminal::setColor(Color color) const{
 	std::cout << "\033[" << static_cast<int>(color) << 'm';
 }

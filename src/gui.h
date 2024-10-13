@@ -1,15 +1,17 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include "terminal.h"
 #include "element.h"
-#include <stdint.h>
+#include <cstdint>
 
 namespace gui{
 	class GUI{
 	private:
+		ter::Terminal terminal;
 		Element* mainElement;
 		Element* currentElement;
-		uint32_t indexEl; 
+		uint32_t indexEl;
 	public:
 		GUI();
 		~GUI();

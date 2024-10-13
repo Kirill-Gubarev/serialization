@@ -1,10 +1,9 @@
 #include "gui.h"
-
 #include <iostream>
-#include "terminal.h"
-#include <vector>
+#include "tHandler.h"
 
 gui::GUI::GUI():
+	terminal(),
 	mainElement(new Element()),
 	currentElement(mainElement),
 	indexEl(0){
@@ -22,34 +21,37 @@ gui::GUI::~GUI(){
 }
 
 void gui::GUI::main_loop(){
-	ter::setAltTerminal(true);
-	ter::setColor(ter::Color::bred);
+	thd::addTermination(std::bind(&ter::Terminal::setAltMode, &terminal, false));
+	thd::addSuspension(std::bind(&ter::Terminal::setAltMode, &terminal, false));
+	thd::addRestoration(std::bind(&ter::Terminal::setAltMode, &terminal, true));
+	terminal.setAltMode(true);
+	terminal.setColor(ter::Color::bred);
 	std::cout << "monkey";
-	ter::setColor(ter::Color::reset);
+	terminal.setColor(ter::Color::reset);
 	std::cout << '\n';
-	ter::setColor(ter::Color::fred);
+	terminal.setColor(ter::Color::fred);
 	std::cout << "monkey";
-	ter::setColor(ter::Color::reset);
+	terminal.setColor(ter::Color::reset);
 	std::cout << '\n';
-	ter::setColor(ter::Color::bblue);
+	terminal.setColor(ter::Color::bblue);
 	std::cout << "monkey";
-	ter::setColor(ter::Color::reset);
+	terminal.setColor(ter::Color::reset);
 	std::cout << '\n';
-	ter::setColor(ter::Color::fblue);
+	terminal.setColor(ter::Color::fblue);
 	std::cout << "monkey";
-	ter::setColor(ter::Color::reset);
+	terminal.setColor(ter::Color::reset);
 	std::cout << '\n';
-	ter::setColor(ter::Color::bgreen);
+	terminal.setColor(ter::Color::bgreen);
 	std::cout << "monkey";
-	ter::setColor(ter::Color::reset);
+	terminal.setColor(ter::Color::reset);
 	std::cout << '\n';
-	ter::setColor(ter::Color::fgreen);
+	terminal.setColor(ter::Color::fgreen);
 	std::cout << "monkey";
-	ter::setColor(ter::Color::reset);
+	terminal.setColor(ter::Color::reset);
 	std::cout << '\n';
 
 	int ch = 0;
-	while((ch = ter::instantGetChar()) != 4){ //ctrl + d
+	while((ch = terminal.instantGetChar()) != 4){ //ctrl + d
 		if(ch == 'w')
 			indexEl--;
 		else if(ch == 's')
@@ -59,7 +61,7 @@ void gui::GUI::main_loop(){
 		printElements();
 	}
 
-	ter::setAltTerminal(false);
+	terminal.setAltMode(false);
 }
 void gui::GUI::printElements() const{
 	const std::vector<Element*>& childs = currentElement->getChilds();
@@ -67,10 +69,10 @@ void gui::GUI::printElements() const{
 
 	for(size_t i = 0; i < numberChilds; ++i){
 		if(i == indexEl)
-			ter::setColor(ter::Color::reverse);
+			terminal.setColor(ter::Color::reverse);
 		std::cout << childs[i]->getName();
 		if(i == indexEl)
-			ter::setColor(ter::Color::reset);
+			terminal.setColor(ter::Color::reset);
 		std::cout << '\n';
 	}
 	std::cout << std::endl;
