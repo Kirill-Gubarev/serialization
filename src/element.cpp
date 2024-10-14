@@ -1,5 +1,4 @@
 #include "element.h"
-#include <iostream>
 
 gui::Element::Element()
 	:Element("NULL"){
@@ -7,7 +6,6 @@ gui::Element::Element()
 }
 gui::Element::Element(const std::string name):
 	name(name){
-			
 }
 gui::Element::~Element(){
 	for(auto& el : childs){
@@ -29,9 +27,10 @@ const std::vector<gui::Element*>& gui::Element::getChilds() const{
 	return childs;
 }
 
-void gui::Element::operator()(){
-	if(childs.size() == 0)
-		std::cout << "operator()" << std::endl;
-	else
-		std::cout << "monkey" << std::endl;
+gui::Element* gui::Element::operator()(int index){
+	if(childs.size() == 0){
+		func();
+		return this;
+	}
+	return childs[index];
 }
