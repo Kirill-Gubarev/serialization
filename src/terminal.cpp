@@ -1,5 +1,4 @@
 #include "terminal.h"
-#include <iostream>
 
 #if defined (__linux__)
 #include <termios.h>
@@ -49,17 +48,17 @@ namespace ter{
 	//enabling or disabling an alternative buffer.
 	static void setAltBuf(bool enable){
 		if(enable)
-			std::cout << "\033[?1049h" << std::endl;
+			std::cout << "\033[?1049h" << std::flush;
 		else
-			std::cout << "\033[?1049l" << std::endl;
+			std::cout << "\033[?1049l" << std::flush;
 	}
 
 	//enabling or disabling cursor visibility.
 	static void setCursorVisibility(bool enable){
 		if(enable)
-			std::cout << "\033[?25h" << std::endl;
+			std::cout << "\033[?25h" << std::flush;
 		else
-			std::cout << "\033[?25l" << std::endl;
+			std::cout << "\033[?25l" << std::flush;
 	}
 
 }
@@ -98,6 +97,21 @@ int ter::instantGetChar(){
 	return _getch();
 }
 #endif
-void ter::setColor(Color color){
-	std::cout << "\033[" << static_cast<int>(color) << 'm';
+
+std::ostream& ter::operator<<(std::ostream& io, const Color color){
+	return io << "\033[" << static_cast<int>(color) << 'm';
 }
+void ter::setColor(Color color){
+	std::cout << color;
+}
+
+#if defined (__linux__)
+void ter::setCursorPos(int x, int y){
+	std::cout << "\033[" << y << ';' << x << 'H';
+}
+#elif defined (_WIN32)
+void ter::setCursorPos(int x, int y){
+	COORD pos = {static_cast<short>(x), static_cast<short>(y)};
+    SetConsoleCursorPosition(hConsole, pos);
+}
+#endif

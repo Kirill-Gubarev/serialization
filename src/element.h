@@ -22,7 +22,11 @@ namespace gui{
 
 		//getters
 		std::string getName() const;
+		std::vector<Element>::size_type	getChildsSize() const;
+
+		//getting child elements
 		const std::vector<Element*>& getChilds() const;
+		Element& getChild(size_t index) const;
 
 		Element* operator()(int index);
 	};

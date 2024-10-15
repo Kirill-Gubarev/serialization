@@ -23,8 +23,14 @@ void gui::Element::addChild(const std::initializer_list<Element*>& els){
 std::string gui::Element::getName() const{
 	return name;
 }
+std::vector<gui::Element>::size_type gui::Element::getChildsSize() const{
+	return childs.size();
+}
 const std::vector<gui::Element*>& gui::Element::getChilds() const{
 	return childs;
+}
+gui::Element& gui::Element::getChild(size_t index) const{
+	return *childs[index];
 }
 
 gui::Element* gui::Element::operator()(int index){

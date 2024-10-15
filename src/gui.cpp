@@ -10,8 +10,33 @@
 namespace gui{
 	static std::unique_ptr<Element> mainElement = nullptr;
 	static Element* currentElement = nullptr;
-	static uint32_t indexEl = 0;
+	static size_t indexEl = 0;
 	static bool isExit = false;
+
+	static void addIndexEl(size_t num){
+		size_t childsSize = currentElement->getChildsSize();
+		indexEl = (indexEl + num + childsSize) % childsSize;
+	}
+
+	static void printColoredText(const std::string& text, ter::Color color){
+		std::cout << color << text << ter::Color::reset << '\n';
+	}
+
+	static void printElements(){
+		const std::vector<Element*>& childs = currentElement->getChilds();
+		size_t numberChilds = currentElement->getChildsSize();
+
+		ter::setCursorPos(0, 0);
+		for(size_t i = 0; i < numberChilds; ++i){
+			if(i == indexEl){
+				printColoredText(childs[i]->getName(), ter::Color::reverse);
+			}
+			else{
+				std::cout << childs[i]->getName() << '\n';
+			}
+		}
+		std::cout << std::endl;
+	}
 
 	static int keyboardCallBack(evn::Key k){
 		switch(k){
@@ -28,35 +53,21 @@ namespace gui{
 			case evn::Key::w:
 			case evn::Key::k:
 			case evn::Key::UP_ARROW:
-				indexEl--;
+				addIndexEl(-1);
 			break;
 
 			case evn::Key::s:
 			case evn::Key::j:
 			case evn::Key::DOWN_ARROW:
-				indexEl++;
+				addIndexEl(1);
 			break;
 
 			default: return 0;
 		}
 		return 1;
 	}
-
-	static void printElements(){
-		const std::vector<Element*>& childs = currentElement->getChilds();
-		size_t numberChilds = childs.size();
-
-		for(size_t i = 0; i < numberChilds; ++i){
-			if(i == indexEl)
-				ter::setColor(ter::Color::reverse);
-			std::cout << childs[i]->getName();
-			if(i == indexEl)
-				ter::setColor(ter::Color::reset);
-			std::cout << '\n';
-		}
-		std::cout << std::endl;
-	}
 }
+
 void gui::init(){
 	thd::init();
 	ter::init();
@@ -81,9 +92,11 @@ void gui::main_loop(){
 
 	evn::setCallback(keyboardCallBack);
 
+	printElements();
 	while(!isExit){
-		if(evn::keyboardEvents())//if the desired character has been read
+		if(evn::keyboardEvents()){//if the desired character has been read
 			printElements();
+		}
 	}
 
 	std::cout << "press any key to continue..." << std::endl;
