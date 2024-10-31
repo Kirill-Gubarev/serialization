@@ -1,8 +1,8 @@
 #include "gui.h"
 #include "element.h"
-#include "terminal.h"
-#include "keyEvents.h"
-#include "tHandler.h"
+#include "ter/terminal.h"
+#include "ter/keyEvents.h"
+#include "ter/tHandler.h"
 
 #include <iostream>
 #include <memory>

@@ -5,12 +5,25 @@
 #include <csignal>
 #include <unistd.h>
 
-static std::vector<std::function<void()>> termTasks;
+namespace thd{
+	static std::vector<std::function<void()>> termTasks;
+	static void execute(const std::vector<std::function<void()>>& tasks);
+	static void terminate(int signal);
 #if defined (__linux__)
-static std::vector<std::function<void()>> suspTasks;
-static std::vector<std::function<void()>> restTasks;
+	static std::vector<std::function<void()>> suspTasks;
+	static std::vector<std::function<void()>> restTasks;
+	static void suspend(int signal);
+	static void restore(int signal);
 #endif
+}
 
+void thd::init(){
+	std::signal(SIGINT, terminate);
+#if defined (__linux__)
+	std::signal(SIGTSTP, suspend);
+    std::signal(SIGCONT, restore);
+#endif
+}
 void thd::addTermination(const std::function<void()>& func){
 	termTasks.push_back(func);
 }
@@ -25,34 +38,25 @@ void thd::addRestoration(const std::function<void()>& func){
 #endif
 }
 
-static void execute(const std::vector<std::function<void()>>& tasks){
+void thd::execute(const std::vector<std::function<void()>>& tasks){
 	size_t size = tasks.size();
 	for(size_t i = 0; i < size; ++i)
 		tasks[i]();
 }
-
-static void terminate(int signal){
+void thd::terminate(int signal){
 	execute(termTasks);
 	exit(signal);
 }
 
 #if defined (__linux__)
-static void suspend(int signal) {
+void thd::suspend(int signal) {
     execute(suspTasks);
     std::signal(SIGTSTP, SIG_DFL);
     raise(SIGTSTP);
 }
-
-static void restore(int signal) {
+void thd::restore(int signal) {
 	execute(restTasks);
 	std::signal(SIGTSTP, suspend);
 }
 #endif
 
-void thd::init(){
-	std::signal(SIGINT, terminate);
-#if defined (__linux__)
-	std::signal(SIGTSTP, suspend);
-    std::signal(SIGCONT, restore);
-#endif
-}

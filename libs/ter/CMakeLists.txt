@@ -1,0 +1,10 @@
+add_library(terminal
+    color.h
+    keyEvents.cpp
+    keyEvents.h
+    key.h
+    terminal.cpp
+    terminal.h
+    tHandler.cpp
+    tHandler.h
+)

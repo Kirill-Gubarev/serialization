@@ -5,10 +5,10 @@
 
 //termination handler
 namespace thd{
+	void init();
 	void addTermination(const std::function<void()>& func);
 	void addSuspension(const std::function<void()>& func);
 	void addRestoration(const std::function<void()>& func);
-	void init();
 }
 
 #endif//THANDLER_H
