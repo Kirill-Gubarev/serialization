@@ -8,99 +8,124 @@
 #include <memory>
 
 namespace gui{
-	static std::unique_ptr<Element> mainElement = nullptr;
-	static Element* currentElement = nullptr;
+	static std::unique_ptr<Element> mainEl = nullptr;
+	static Element* currentEl = nullptr;
 	static size_t indexEl = 0;
 	static bool isExit = false;
 
-	static void addIndexEl(size_t num){
-		size_t childsSize = currentElement->getChildsSize();
-		indexEl = (indexEl + num + childsSize) % childsSize;
-	}
-
-	static void printColoredText(const std::string& text, ter::Color color){
-		std::cout << color << text << ter::Color::reset << '\n';
-	}
-
-	static void printElements(){
-		const std::vector<Element*>& childs = currentElement->getChilds();
-		size_t numberChilds = currentElement->getChildsSize();
-
-		ter::setCursorPos(0, 0);
-		for(size_t i = 0; i < numberChilds; ++i){
-			if(i == indexEl){
-				printColoredText(childs[i]->getName(), ter::Color::reverse);
-			}
-			else{
-				std::cout << childs[i]->getName() << '\n';
-			}
-		}
-		std::cout << std::endl;
-	}
-
-	static int keyboardCallBack(evn::Key k){
-		switch(k){
-			case evn::Key::CTRL_C:
-				std::cout << "\nctrl + c pressed" << std::endl;
-				isExit = true;
-			return 0;
-
-			case evn::Key::CTRL_D:
-				std::cout << "\nctrl + d pressed" << std::endl;
-				isExit = true;
-			return 0;
-
-			case evn::Key::w:
-			case evn::Key::k:
-			case evn::Key::UP_ARROW:
-				addIndexEl(-1);
-			break;
-
-			case evn::Key::s:
-			case evn::Key::j:
-			case evn::Key::DOWN_ARROW:
-				addIndexEl(1);
-			break;
-
-			default: return 0;
-		}
-		return 1;
-	}
+	static int keyboardCallBack(evn::Key k);
+	static void printColoredText(const std::string& text, ter::Color color);
+	static void printElements();
+	static void addIndexEl(size_t num);
+	static void executeEl();
 }
 
 void gui::init(){
 	thd::init();
 	ter::init();
 
-	mainElement.reset(new Element());
-	currentElement = mainElement.get();
+	mainEl.reset(new Element());
+	currentEl = mainEl.get();
 
-	mainElement->addChild({
-			new Element("el1"),
-			new Element("el2"),
-			new Element("el3"),
-			new Element("el4"),
-			new Element("el5"),
+	Element* elCE = new Element("contains elements");
+	elCE->addChild({
+			new Element("EL1"),
+			new Element("EL2"),
+			new Element("EL3")
 		});
-}
 
-void gui::main_loop(){
+	mainEl->addChild({
+			new Element(),
+			elCE,
+			new Element("el3", [](){std::cout<<"i am element 3";}),
+			new Element("el4"),
+			new Element(),
+		});
+	mainEl->getChild(3).setFunction([](){std::cout<<"i am element 4";});
+
 	thd::addTermination(std::bind(&ter::setAltMode, false));
 	thd::addSuspension(std::bind(&ter::setAltMode, false));
 	thd::addRestoration(std::bind(&ter::setAltMode, true));
 	ter::setAltMode(true);
 
 	evn::setCallback(keyboardCallBack);
-
+}
+void gui::main_loop(){
 	printElements();
 	while(!isExit){
 		if(evn::keyboardEvents()){//if the desired character has been read
 			printElements();
 		}
 	}
-
+}
+void gui::terminate(){
 	std::cout << "press any key to continue..." << std::endl;
 	ter::instantGetChar();
-
 	ter::setAltMode(false);
+}
+
+int gui::keyboardCallBack(evn::Key k){
+	switch(k){
+		case evn::Key::CTRL_C:
+			std::cout << "\nctrl + c pressed" << std::endl;
+			isExit = true;
+		return 0;
+
+		case evn::Key::CTRL_D:
+			std::cout << "\nctrl + d pressed" << std::endl;
+			isExit = true;
+		return 0;
+
+		case evn::Key::w:
+		case evn::Key::k:
+		case evn::Key::UP_ARROW:
+			addIndexEl(-1);
+		break;
+
+		case evn::Key::s:
+		case evn::Key::j:
+		case evn::Key::DOWN_ARROW:
+			addIndexEl(1);
+		break;
+
+		case evn::Key::ENTER:
+			executeEl();
+		break;
+
+		default: return 0;
+	}
+	return 1;
+}
+void gui::printColoredText(const std::string& text, ter::Color color){
+	std::cout << color << text << ter::Color::reset << '\n';
+}
+void gui::printElements(){
+	const std::vector<Element*>& childs = currentEl->getChilds();
+	size_t numberChilds = currentEl->getChildsSize();
+
+	ter::setCursorPos(0, 0);
+	for(size_t i = 0; i < numberChilds; ++i){
+		if(i == indexEl){
+			printColoredText(childs[i]->getName(), ter::Color::reverse);
+		}
+		else{
+			std::cout << childs[i]->getName() << '\n';
+		}
+	}
+	std::cout << std::endl;
+}
+void gui::addIndexEl(size_t num){
+	size_t childsSize = currentEl->getChildsSize();
+	indexEl = (indexEl + num + childsSize) % childsSize;
+}
+void gui::executeEl(){
+	Element* selectedEl = &currentEl->getChild(indexEl);
+
+	if(selectedEl->isEmpty()){
+		selectedEl->exec();
+	}
+	else{
+		currentEl = selectedEl;
+		ter::clear();
+	}
 }

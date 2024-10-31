@@ -1,12 +1,16 @@
 #include "element.h"
 
-gui::Element::Element()
-	:Element("NULL"){
+gui::Element::Element():Element("NULL"){}
+gui::Element::Element(const std::string name):Element(name, nullptr){}
+gui::Element::Element(const std::string name, void (*func)()):
+	name(name),	func(func){
 
 }
-gui::Element::Element(const std::string name):
-	name(name){
+
+void gui::Element::setFunction(void (*func)()){
+	this->func = func;
 }
+
 gui::Element::~Element(){
 	for(auto& el : childs){
 		delete el;
@@ -33,10 +37,10 @@ gui::Element& gui::Element::getChild(size_t index) const{
 	return *childs[index];
 }
 
-gui::Element* gui::Element::operator()(int index){
-	if(childs.size() == 0){
-		func();
-		return this;
-	}
-	return childs[index];
+void gui::Element::exec() const{
+	if(func) func();
+}
+
+bool gui::Element::isEmpty(){
+	return childs.size() == 0;
 }

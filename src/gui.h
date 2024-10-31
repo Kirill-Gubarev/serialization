@@ -4,6 +4,7 @@
 namespace gui{
 	void init();
 	void main_loop();
+	void terminate();
 }
 
 #endif//GUI_H

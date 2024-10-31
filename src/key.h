@@ -9,6 +9,14 @@ namespace evn{
 		CTRL_C 		= 3,
 		CTRL_D		= 4,
 
+		SPACE		= ' ',
+
+#if defined (__linux__)
+		ENTER		= 10, //'\n'
+#elif defined (_WIN32)
+		ENTER		= 13,
+#endif
+
 		w			= 'w',
 		s			= 's',
 		d			= 'd',

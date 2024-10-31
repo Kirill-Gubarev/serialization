@@ -14,7 +14,10 @@ namespace gui{
 		//constructors
 		Element();
 		Element(const std::string name);
+		Element(const std::string name, void (*func)());
 		~Element();
+
+		void setFunction(void (*func)());
 
 		//adding child elements
 		void addChild(Element* const el);
@@ -28,7 +31,8 @@ namespace gui{
 		const std::vector<Element*>& getChilds() const;
 		Element& getChild(size_t index) const;
 
-		Element* operator()(int index);
+		void exec() const;
+		bool isEmpty();
 	};
 }
 
