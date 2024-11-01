@@ -29,7 +29,9 @@ void gui::init(){
 
 	Element* elCE = new Element("contains elements");
 	elCE->addChild({
-			new Element("EL1"),
+			new Element("back", []()->gCode{
+					return gCode::BACK;
+				}),
 			new Element("EL2"),
 			new Element("EL3")
 		});
@@ -37,11 +39,17 @@ void gui::init(){
 	mainEl->addChild({
 			new Element(),
 			elCE,
-			new Element("el3", [](){std::cout<<"i am element 3";}),
+			new Element("el3", []()->gCode {
+					std::cout<<"i am element 3";
+					return gCode::_0;
+				}),
 			new Element("el4"),
 			new Element(),
 		});
-	mainEl->getChild(3).setFunction([](){std::cout<<"i am element 4";});
+	mainEl->getChild(3).setFunction([]()->gCode {
+			std::cout<<"i am element 4";
+			return gCode::_0;
+		});
 
 	thd::addTermination(std::bind(&ter::setAltMode, false));
 	thd::addSuspension(std::bind(&ter::setAltMode, false));
@@ -122,10 +130,13 @@ void gui::executeEl(){
 	Element* selectedEl = &currentEl->getChild(indexEl);
 
 	if(selectedEl->isEmpty()){
-		selectedEl->exec();
+		if(selectedEl->exec() == gCode::BACK){
+			currentEl = currentEl->getParent();
+		}
 	}
 	else{
 		currentEl = selectedEl;
+		indexEl = 0;
 		ter::clear();
 	}
 }
