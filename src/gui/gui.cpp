@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "element.h"
+
 #include "ter/terminal.h"
 #include "ter/keyEvents.h"
 #include "ter/tHandler.h"
@@ -10,13 +11,13 @@
 namespace gui{
 	static std::unique_ptr<Element> mainEl = nullptr;
 	static Element* currentEl = nullptr;
-	static size_t indexEl = 0;
+	static uint64_t indexEl = 0;
 	static bool isExit = false;
 
 	static int keyboardCallBack(evn::Key k);
 	static void printColoredText(const std::string& text, ter::Color color);
 	static void printElements();
-	static void addIndexEl(size_t num);
+	static void addIndexEl(uint64_t num);
 	static void executeEl();
 }
 
@@ -109,7 +110,7 @@ void gui::printColoredText(const std::string& text, ter::Color color){
 }
 void gui::printElements(){
 	const std::vector<Element*>& childs = currentEl->getChilds();
-	size_t numberChilds = currentEl->getChildsSize();
+	uint64_t numberChilds = currentEl->getNumberChilds();
 
 	ter::setCursorPos(0, 0);
 	for(size_t i = 0; i < numberChilds; ++i){
@@ -122,8 +123,8 @@ void gui::printElements(){
 	}
 	std::cout << std::endl;
 }
-void gui::addIndexEl(size_t num){
-	size_t childsSize = currentEl->getChildsSize();
+void gui::addIndexEl(uint64_t num){
+	uint64_t childsSize = currentEl->getNumberChilds();
 	indexEl = (indexEl + num + childsSize) % childsSize;
 }
 void gui::executeEl(){

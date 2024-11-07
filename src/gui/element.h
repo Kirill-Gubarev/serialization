@@ -29,7 +29,7 @@ namespace gui{
 
 		//getters
 		std::string getName() const;
-		std::vector<Element>::size_type	getChildsSize() const;
+		uint64_t getNumberChilds() const;
 		Element* getParent() const;
 
 		//getting child elements

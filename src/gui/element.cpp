@@ -6,11 +6,6 @@ gui::Element::Element(const std::string name, gCode (*func)()):
 	name(name),	func(func), parent(nullptr){
 
 }
-
-void gui::Element::setFunction(gCode (*func)()){
-	this->func = func;
-}
-
 gui::Element::~Element(){
 	for(auto& el : childs){
 		delete el;
@@ -20,6 +15,12 @@ gui::Element::~Element(){
 void gui::Element::setParent(Element* el){
 	parent = el;
 }
+
+
+void gui::Element::setFunction(gCode (*func)()){
+	this->func = func;
+}
+
 void gui::Element::addChild(Element* el){
 	el->setParent(this);
 	childs.push_back(el);
@@ -33,7 +34,7 @@ void gui::Element::addChild(const std::initializer_list<Element*>& els){
 std::string gui::Element::getName() const{
 	return name;
 }
-std::vector<gui::Element>::size_type gui::Element::getChildsSize() const{
+uint64_t gui::Element::getNumberChilds() const{
 	return childs.size();
 }
 gui::Element* gui::Element::getParent() const{
@@ -52,7 +53,6 @@ gui::gCode gui::Element::exec() const{
 		return func();
 	return gCode::ERROR;
 }
-
 bool gui::Element::isEmpty(){
 	return childs.size() == 0;
 }
