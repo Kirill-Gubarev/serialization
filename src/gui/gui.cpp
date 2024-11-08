@@ -5,6 +5,7 @@
 #include "ter/tHandler.h"
 
 #include <iostream>
+#include <stdexcept>
 
 namespace gui{
 	static Element* mainEl = nullptr;
@@ -31,6 +32,11 @@ void gui::init(){
 	evn::setCallback(keyboardCallBack);
 }
 void gui::main_loop(){
+	if(!mainEl)
+		throw std::runtime_error("ERROR: the main element was not initialized");
+	else if(mainEl->isEmpty())
+		throw std::runtime_error("ERROR: the main element contains nothing");
+
 	printElements();
 	while(!isExit){
 		if(evn::keyboardEvents()){//if the desired character has been read
@@ -109,7 +115,7 @@ void gui::executeEl(){
 	Element* selectedEl = &currentEl->getChild(indexEl);
 
 	if(selectedEl->isEmpty()){
-		if(selectedEl->exec() == gCode::BACK){
+		if(selectedEl->exec() == gCode::BACK && currentEl != mainEl){
 			currentEl = currentEl->getParent();
 		}
 	}

@@ -45,7 +45,7 @@ void app::createGui(){
 	});
 
 	mainEl->addChild({
-		new gui::Element("element 1", gui::iam),
+		new gui::Element("back", gui::back),
 		elCE,
 		new gui::Element("element 3", gui::iam),
 		new gui::Element("element 4", gui::iam),
