@@ -1,15 +1,13 @@
 #include "gui.h"
-#include "element.h"
 
 #include "ter/terminal.h"
 #include "ter/keyEvents.h"
 #include "ter/tHandler.h"
 
 #include <iostream>
-#include <memory>
 
 namespace gui{
-	static std::unique_ptr<Element> mainEl = nullptr;
+	static Element* mainEl = nullptr;
 	static Element* currentEl = nullptr;
 	static uint64_t indexEl = 0;
 	static bool isExit = false;
@@ -24,33 +22,6 @@ namespace gui{
 void gui::init(){
 	thd::init();
 	ter::init();
-
-	mainEl.reset(new Element());
-	currentEl = mainEl.get();
-
-	Element* elCE = new Element("contains elements");
-	elCE->addChild({
-			new Element("back", []()->gCode{
-					return gCode::BACK;
-				}),
-			new Element("EL2"),
-			new Element("EL3")
-		});
-
-	mainEl->addChild({
-			new Element(),
-			elCE,
-			new Element("el3", []()->gCode {
-					std::cout<<"i am element 3";
-					return gCode::_0;
-				}),
-			new Element("el4"),
-			new Element(),
-		});
-	mainEl->getChild(3).setFunction([]()->gCode {
-			std::cout<<"i am element 4";
-			return gCode::_0;
-		});
 
 	thd::addTermination(std::bind(&ter::setAltMode, false));
 	thd::addSuspension(std::bind(&ter::setAltMode, false));
@@ -68,9 +39,16 @@ void gui::main_loop(){
 	}
 }
 void gui::terminate(){
+	if(mainEl)
+		delete mainEl;
+
 	std::cout << "press any key to continue..." << std::endl;
 	ter::instantGetChar();
 	ter::setAltMode(false);
+}
+void gui::setMainElement(Element* el){
+	mainEl = el;
+	currentEl = el;
 }
 
 int gui::keyboardCallBack(evn::Key k){

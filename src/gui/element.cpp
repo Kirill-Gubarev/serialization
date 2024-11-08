@@ -2,13 +2,14 @@
 
 gui::Element::Element():Element("NULL"){}
 gui::Element::Element(const std::string name):Element(name, nullptr){}
-gui::Element::Element(const std::string name, gCode (*func)()):
+gui::Element::Element(const std::string name, gCode (*func)(const Element* self)):
 	name(name),	func(func), parent(nullptr){
 
 }
 gui::Element::~Element(){
 	for(auto& el : childs){
-		delete el;
+		if(el)
+			delete el;
 	}
 }
 
@@ -17,7 +18,7 @@ void gui::Element::setParent(Element* el){
 }
 
 
-void gui::Element::setFunction(gCode (*func)()){
+void gui::Element::setFunction(gCode (*func)(const Element* self)){
 	this->func = func;
 }
 
@@ -50,9 +51,9 @@ gui::Element& gui::Element::getChild(size_t index) const{
 
 gui::gCode gui::Element::exec() const{
 	if(func)
-		return func();
+		return func(this);
 	return gCode::ERROR;
 }
-bool gui::Element::isEmpty(){
+bool gui::Element::isEmpty() const{
 	return childs.size() == 0;
 }

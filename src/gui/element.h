@@ -11,17 +11,17 @@ namespace gui{
 		std::string name;
 		std::vector<Element*> childs;
 		Element* parent;
-		gCode (*func)();
+		gCode (*func)(const Element* self);
 
 		void setParent(Element* el);
 	public:
 		//constructors
 		Element();
 		Element(const std::string name);
-		Element(const std::string name, gCode (*func)());
+		Element(const std::string name, gCode (*func)(const Element* self));
 		~Element();
 
-		void setFunction(gCode (*func)());
+		void setFunction(gCode (*func)(const Element* self));
 
 		//adding child elements
 		void addChild(Element* el);
@@ -37,7 +37,7 @@ namespace gui{
 		Element& getChild(size_t index) const;
 
 		gCode exec() const;
-		bool isEmpty();
+		bool isEmpty() const;
 	};
 }
 

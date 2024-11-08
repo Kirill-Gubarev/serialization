@@ -1,8 +1,6 @@
-#include "gui/gui.h"
+#include "app.h"
 
 int main(int argc, char* argv[]){
-	gui::init();
-	gui::main_loop();
-	gui::terminate();
+	app::exec();
     return 0;
 }
